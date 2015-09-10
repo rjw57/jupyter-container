@@ -1,0 +1,11 @@
+# Required for jupyter kernels to work
+jupyter
+ipython
+
+# A base set of packages which it is useful to have on a scientific workstation.
+matplotlib
+pillow
+scikit-image
+scikit-learn
+scipy
+
