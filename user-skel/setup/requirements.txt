@@ -1,6 +1,0 @@
-# Jupyter notebook server and latest ipython
-ipython
-jupyter
-
-# Add any additional Python packages which should be installed here
-
