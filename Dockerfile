@@ -1,18 +1,10 @@
-FROM ubuntu:14.04
+FROM ipython/scipystack
 MAINTAINER Rich Wareham <rich.compute-container@richwareham.com>
 
-# Install packages for compiling Python and the initial set of packages.
-RUN apt-get -y update && apt-get -y install make build-essential libssl-dev \
-	zlib1g-dev libbz2-dev libreadline-dev libsqlite3-dev wget curl llvm \
-	libncurses5-dev tk-dev liblapack-dev gfortran
-
-# Enable installation of PPAs, git checkouts and install some other common
-# programs,
-RUN apt-get -y install software-properties-common git htop curl wget
-
 # Install a later version of CMake (needed for OpenCV install script)
-RUN add-apt-repository -y ppa:george-edison55/cmake-3.x && apt-get -y update && \
-	apt-get -y install cmake
+RUN apt-get -y install software-properties-common && \
+	add-apt-repository -y ppa:george-edison55/cmake-3.x && \
+	apt-get -y update && apt-get -y install cmake
 
 # Configure full name and login id for the compute user
 ENV USER_LOGIN="${USER_LOGIN:-compute-user}" \
@@ -29,16 +21,16 @@ RUN adduser --disabled-password --home "${USER_HOME_DIR}" \
 	--gecos "${USER_FULL_NAME},,," "${USER_LOGIN}" && \
 	adduser "${USER_LOGIN}" compute-users
 
+# Copy user skeleton and fix permissions
+ADD user-skel "${USER_HOME_DIR}"
+RUN chown -R "${USER_LOGIN}" "${USER_HOME_DIR}"
+
 # Remainder of script runs as user in their home directory
 USER "${USER_LOGIN}"
 WORKDIR "${USER_HOME_DIR}"
 
-# Copy user skeleton and configuration
-ADD user-skel .
-ADD dot-jupyter .jupyter
-
-# Run initial setup
-RUN setup/initial-setup.sh
+# Run initial setup tasks
+RUN setup/initial-setup.sh && setup/install-opencv.sh && rm -r setup/
 
 EXPOSE 8888
-CMD [ "bash", "-l", "-c", "jupyter notebook" ]
+CMD [ "/bin/bash", "-c", ". ~/.local/setup_vars.sh; jupyter notebook" ]

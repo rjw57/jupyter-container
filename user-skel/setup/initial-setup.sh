@@ -2,59 +2,40 @@
 #
 # Initial setup script for compute machine
 
-# Versions of Python to install
-PYTHON3_VER=3.4.3
-PYTHON2_VER=2.7.10
-
 # Log commands & exit on error
 set -xe
 
-function main() {
-	install_pyenv
-	install_pythons
+echo "Copying dotfiles..."
+for _df in "${HOME}"/dotfiles/*; do
+	_bn="$(basename "${_df}")"
+	echo " - ${_bn}"
+	cp -rapv "${_df}" "${HOME}"/."${_bn}"
+done
+echo "Removing original dotfile directory..."
+rm -r "${HOME}/dotfiles"
 
-	echo "Configuring default Python versions for user..."
-	pyenv global "${PYTHON3_VER}" "${PYTHON2_VER}"
-
-	echo "Installing initial package set..."
-	for _pkg in pip numpy scipy ipython jupyter; do
-		pip2 install --upgrade ${_pkg}
-		pip3 install --upgrade ${_pkg}
-	done
-
-	echo "Configuring Jupyter notebook server for Python 2 and 3..."
-	setup_jupyter python2 "Python 2"
-	setup_jupyter python3 "Python 3"
-
-	echo "Installing remaining requirements..."
-	pip2 install -r setup/requirements.txt
-	pip3 install -r setup/requirements.txt
-}
-
-function install_pyenv() {
-	# Install and configure pyenv
-	echo "Installing pyenv..."
-	git clone https://github.com/yyuu/pyenv.git ~/.pyenv
-	cat >>~/.bash_profile <<EOI
-export PATH="\${HOME}/.pyenv/bin:\${PATH}"
-eval "\$(pyenv init -)"
+echo "Configuring environment..."
+_local_dir="${HOME}/.local"
+mkdir -p "${_local_dir}"
+_setup_vars_sh="${_local_dir}/setup_vars.sh"
+cat >"${_setup_vars_sh}" <<EOI
+export PATH="${_local_dir}/bin:\${PATH}"
+export LD_LIBRARY_PATH="${_local_dir}/lib:\${LD_LIBRARY_PATH}"
 EOI
-	cat >>~/.bashrc <<EOI
-source "\${HOME}/.bash_profile"
+cat >>"${HOME}/.bashrc" <<EOI
+source "\${HOME}/.local/setup_vars.sh"
 EOI
 
-	# Setup pyenv for the remainder of this script
-	export PATH="${HOME}/.pyenv/bin:${PATH}"
-	eval "$(pyenv init -)"
-}
+# make sure that .local appears on the path for the rest of the script
+source "${_setup_vars_sh}"
 
-function install_pythons() {
-	# Install Python(s)
-	echo "Installing Python 3..."
-	CFLAGS="-O2" PYTHON_CONFIGURE_OPTS="--enable-shared" pyenv install "${PYTHON3_VER}"
-	echo "Installing Python 2..."
-	CFLAGS="-O2" PYTHON_CONFIGURE_OPTS="--enable-shared" pyenv install "${PYTHON2_VER}"
-}
+for _pip in pip2 pip3; do
+	echo "Upgrading ${_pip}..."
+	${_pip} install --upgrade pip
+
+	echo "Installing remaining requirements via ${_pip}..."
+	${_pip} install --upgrade -r setup/requirements.txt
+done
 
 function setup_jupyter() {
 	_python=$1
@@ -77,4 +58,7 @@ EOI
 	rm -r "${_ktmp}"
 }
 
-main
+echo "Configuring Jupyter notebook server for Python 2 and 3..."
+setup_jupyter python2 "Python 2"
+setup_jupyter python3 "Python 3"
+
