@@ -1,16 +1,16 @@
 FROM ubuntu:14.04
 MAINTAINER Rich Wareham <rich.compute-container@richwareham.com>
 
-# Install packages for compiling Python, OpenCV and the initial set of packages.
+# Install packages for compiling Python and the initial set of packages.
 RUN apt-get -y update && apt-get -y install make build-essential libssl-dev \
 	zlib1g-dev libbz2-dev libreadline-dev libsqlite3-dev wget curl llvm \
-	libncurses5-dev tk-dev liblapack-dev gfortran && apt-get -y build-dep opencv
+	libncurses5-dev tk-dev liblapack-dev gfortran
 
 # Enable installation of PPAs, git checkouts and install some other common
 # programs,
 RUN apt-get -y install software-properties-common git htop curl wget
 
-# Install a later version of CMake
+# Install a later version of CMake (needed for OpenCV install script)
 RUN add-apt-repository -y ppa:george-edison55/cmake-3.x && apt-get -y update && \
 	apt-get -y install cmake
 
@@ -20,7 +20,7 @@ ENV USER_LOGIN="${USER_LOGIN:-compute-user}" \
 ENV USER_HOME_DIR="/users/${USER_LOGIN}"
 
 # Copy local configuration & fix perms
-ADD conf /
+ADD system-conf /
 RUN chown -R root:root /etc/sudoers.d && chmod 0440 /etc/sudoers.d/*
 
 # Create a new admin user
@@ -32,34 +32,13 @@ RUN adduser --disabled-password --home "${USER_HOME_DIR}" \
 # Remainder of script runs as user in their home directory
 USER "${USER_LOGIN}"
 WORKDIR "${USER_HOME_DIR}"
-RUN mkdir setup
 
-# Install Python
-ADD user/install-python.sh setup/
-RUN setup/install-python.sh
+# Copy user skeleton and configuration
+ADD user-skel .
+ADD dot-jupyter .jupyter
 
-# Install Python packages which need to be installed early
-ADD user/install-python-pkgs.sh setup/
-RUN setup/install-python-pkgs.sh
-
-# Install any other packages listed in requirements.txt
-ADD user/requirements.txt setup/
-RUN bash -l -c "pip2 install -r setup/requirements.txt" && \
-	bash -l -c "pip3 install -r setup/requirements.txt"
-
-# Install latest OpenCV for Python
-ADD user/install-opencv.sh setup/
-RUN setup/install-opencv.sh
-
-# Setup the jupyter kernels
-ADD user/setup-jupyter.sh setup/
-RUN setup/setup-jupyter.sh
-
-# Remove setup scripts
-RUN rm -r setup/
+# Run initial setup
+RUN setup/initial-setup.sh
 
 EXPOSE 8888
-RUN mkdir -p notebooks
-CMD [ "bash", "-l", "-c", \
-	"SHELL=/bin/bash jupyter notebook --notebook-dir=\"${HOME}/notebooks\" --ip=0.0.0.0 --port=8888 --no-browser" \
-]
+CMD [ "bash", "-l", "-c", "jupyter notebook" ]
