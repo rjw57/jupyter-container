@@ -37,3 +37,8 @@ Some niceties of configuration include:
     packages installed via ``pip`` which have command-line scripts will work as
     expected.
 
+## Virtual machine using Vagrant
+
+If you have Vagrant installed, the provided Vagrant file can be used to
+provision a virtual machine running the container.
+
