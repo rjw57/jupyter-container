@@ -13,7 +13,7 @@ The container exposes a single port which the Jupyter notebook server runs on.
 Launch the container with an incantation similar to the following:
 
 ```console
-$ docker run -i -p 8888:8888/tcp rjw57/jupyter-container
+$ docker run -i -p 8888:8888/tcp rjw57/jupyter
 ```
 
 By default the Jupyter notebook runs as a user which is given ``sudo`` access
@@ -23,7 +23,7 @@ setting the ``USER`` and ``USER_UID`` environment variables. For example, to
 launch the container for the current user:
 
 ```console
-$ docker run -i -p 8888:8888/tcp -e USER -e USER_UID=$(id -u) rjw57/jupyter-container
+$ docker run -i -p 8888:8888/tcp -e USER -e USER_UID=$(id -u) rjw57/jupyter
 ```
 
 Some niceties of configuration include:
