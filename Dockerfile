@@ -2,7 +2,8 @@ FROM ipython/scipystack
 MAINTAINER Rich Wareham <rich.compute-container@richwareham.com>
 
 # Install some useful packages
-RUN apt-get -y install vim git htop python-dev python3-dev
+RUN apt-get -y install vim git htop python-dev python3-dev \
+	bash-completion
 
 # Install a later version of CMake (needed for OpenCV install script)
 RUN apt-get -y install software-properties-common && \
