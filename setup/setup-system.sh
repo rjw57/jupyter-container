@@ -8,7 +8,7 @@ set -xe
 OPENCV_VER=3.0.0
 OPENCV_CONTRIB_VER="${OPENCV_VER}"
 OPENCV_INSTALL_PREFIX="/opt/opencv"
-PYTHON_PACKAGES="ipython jupyter"
+PYTHON_PACKAGES="numpy numba scipy pillow matplotlib ipython jupyter"
 
 for _pip in pip2 pip3; do
 	echo "Upgrading ${_pip}..."

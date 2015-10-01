@@ -1,4 +1,4 @@
-FROM jupyter/scipy-notebook
+FROM debian:jessie
 MAINTAINER Rich Wareham <rich.compute-container@richwareham.com>
 
 # Install some useful packages & OpenCV dependencies (taken from build
@@ -13,8 +13,8 @@ RUN apt-get -y update && apt-get -y install libgstreamer1.0-dev \
 	texlive-latex-recommended latex-xcolor texlive-fonts-recommended \
 	vim git htop python-dev python3-dev bash-completion cmake \
 	libgstreamer-plugins-base1.0-dev gstreamer1.0-libav libavresample-dev \
-	libavcodec-dev libavformat-dev \
-	libavutil-dev libswscale-dev libavresample-dev libtbb-dev
+	libavcodec-dev libavformat-dev libavutil-dev libswscale-dev \
+	libavresample-dev libtbb-dev
 
 # Copy local configuration & fix perms
 ADD system-conf /
