@@ -1,19 +1,19 @@
-FROM ipython/scipystack
+FROM jupyter/scipy-notebook
 MAINTAINER Rich Wareham <rich.compute-container@richwareham.com>
 
-# Install some useful packages
-RUN apt-get -y install vim git htop python-dev python3-dev \
-	bash-completion
-
-# Install a later version of CMake (needed for OpenCV install script)
-RUN apt-get -y install software-properties-common && \
-	add-apt-repository -y ppa:george-edison55/cmake-3.x && \
-	apt-get -y update && apt-get -y install cmake
-
-# Install OpenCV dependencies
-RUN apt-get -y build-dep opencv && apt-get -y install libgstreamer1.0-dev \
-	libgstreamer-plugins-base1.0-dev libgstreamer-plugins-good1.0-dev \
-	gstreamer1.0-libav libavresample-dev libavcodec-dev libavformat-dev \
+# Install some useful packages & OpenCV dependencies (taken from build
+# dependencies for Debian package).
+RUN apt-get -y update && apt-get -y install libgstreamer1.0-dev \
+	libavcodec-dev libavformat-dev libswscale-dev libgtk2.0-dev \
+	libgtkglext1-dev libgl1-mesa-dev libglu1-mesa-dev libjasper-dev \
+	libjpeg-dev libpng-dev libtiff-dev libopenexr-dev libraw1394-dev \
+	libdc1394-22-dev libv4l-dev zlib1g-dev liblapack-dev libtbb-dev \
+	libeigen3-dev ocl-icd-opencl-dev python-dev python-numpy python-sphinx \
+	ant default-jdk javahelper texlive-fonts-extra texlive-latex-extra \
+	texlive-latex-recommended latex-xcolor texlive-fonts-recommended \
+	vim git htop python-dev python3-dev bash-completion cmake \
+	libgstreamer-plugins-base1.0-dev gstreamer1.0-libav libavresample-dev \
+	libavcodec-dev libavformat-dev \
 	libavutil-dev libswscale-dev libavresample-dev libtbb-dev
 
 # Copy local configuration & fix perms
