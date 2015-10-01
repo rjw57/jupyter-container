@@ -16,6 +16,8 @@ RUN apt-get -y update && apt-get -y install libgstreamer1.0-dev \
 	libavcodec-dev libavformat-dev libavutil-dev libswscale-dev \
 	libavresample-dev libtbb-dev
 
+RUN apt-get -y install python-pip python3-pip
+
 # Copy local configuration & fix perms
 ADD system-conf /
 RUN chown -R root:root /etc/sudoers.d && chmod 0440 /etc/sudoers.d/*
