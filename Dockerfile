@@ -14,12 +14,9 @@ RUN apt-get -y update && apt-get -y install libgstreamer1.0-dev \
 	vim git htop python-dev python3-dev bash-completion cmake \
 	libgstreamer-plugins-base1.0-dev gstreamer1.0-libav libavresample-dev \
 	libavcodec-dev libavformat-dev libavutil-dev libswscale-dev \
-	libavresample-dev libtbb-dev
-
-RUN apt-get -y install python-pip python3-pip llvm-dev \
-	python-numpy python3-numpy \
-	python-scipy python3-scipy python-pil python3-pil python-enum34 \
-	python-matplotlib python3-matplotlib
+	libavresample-dev libtbb-dev sudo python-pip python3-pip llvm-dev \
+	python-numpy python3-numpy python-scipy python3-scipy python-pil \
+	python3-pil python-enum34 python-matplotlib python3-matplotlib
 
 # Copy local configuration & fix perms
 ADD system-conf /
